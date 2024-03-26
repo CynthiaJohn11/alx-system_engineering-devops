@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+#installs nginx and redirects to video and custom 404
+sudo apt-get -y update
+sudo apt-get -y install nginx
+
+service nginx enable
+service nginx start
+
+printf %s "server {
+    listen 80;
+    listen [::]:80 default_server;
+    root   /etc/nginx/html;
+    index  index.html index.htm;
+
+
+location / {
+        try_files \$uri \$uri/ =404;
+    }
+
+    location /redirect_me {
+        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
+    }
+
+    error_page 400 401 403 404 500 /404.html;
+    location = /404.html {
+      root /usr/share/nginx/html;
+      internal;
+    }
+}" > /etc/nginx/sites-available/default
+
+service nginx reload
+
+echo "Ceci n'est pas une page   " > /usr/share/nginx/html/404.html;
